@@ -1,5 +1,5 @@
 import Card from './Card.jsx';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import uniqid from 'uniqid';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -35,12 +35,18 @@ function isGameOver(pokemonCards) {
     }, true);
 }
 
-function GameScreen({ pokemon, numGuesses, setNumGuesses, replayGame, setGameOver }) {
+const cardFlipSpeeds = {
+    slow: 3000,
+    regular: 1000,
+    fast: 500
+};
+
+function GameScreen({ refCSSTransition, pokemon, numGuesses, setNumGuesses, replayGame, setGameOver }) {
     const initialCardsState = computeInitialCardsState(pokemon);
     const [pokemonCards, setPokemonCards] = useState(initialCardsState);
     const [shownCards, setShownCards] = useState([]);
     const [isClickable, setIsClickable] = useState(true);
-    const gameScreenDiv = useRef(null);
+    const [gameSpeed, setGameSpeed] = useState('regular');
 
     useEffect(() => {
         isGameOver(pokemonCards) && setGameOver();
@@ -58,7 +64,7 @@ function GameScreen({ pokemon, numGuesses, setNumGuesses, replayGame, setGameOve
                         })
                     );
                     setIsClickable(true);
-                }, 1000);
+                }, cardFlipSpeeds[gameSpeed]);
             } else {
                 setPokemonCards((prevPokemonCards) =>
                     prevPokemonCards.map((card) => ({
@@ -88,29 +94,25 @@ function GameScreen({ pokemon, numGuesses, setNumGuesses, replayGame, setGameOve
 
     const clickAllowed = (item) => isClickable && !(item.isFound || item.isVisible);
 
-    // Only runs once
-    useEffect(() => {
-        // Timeout so that it does not get batched together with class creation
-        setTimeout(() => {
-            gameScreenDiv.current.classList.add('fade');
-        }, 10);
-    }, []);
-
-    const replay = () => {
-        gameScreenDiv.current.classList.remove('fade');
-        setTimeout(() => {
-            replayGame();
-        }, 1000);
-    };
-
     let gridStyling;
     if (pokemon.length === 6) gridStyling = { gridTemplateRows: 'repeat(3, 1fr)', gridTemplateColumns: 'repeat(4, 1fr' };
     else if (pokemon.length === 10) gridStyling = { gridTemplateRows: 'repeat(4, 1fr)', gridTemplateColumns: 'repeat(5, 1fr' };
     else if (pokemon.length === 15) gridStyling = { gridTemplateRows: 'repeat(5, 1fr)', gridTemplateColumns: 'repeat(6, 1fr' };
 
     return (
-        <div ref={gameScreenDiv} className='game-screen'>
-            <FontAwesomeIcon className='replay fa-xl' icon={faRotateRight} onClick={replay} />
+        <div ref={refCSSTransition} className='game-screen'>
+            <FontAwesomeIcon className='replay fa-xl' icon={faRotateRight} onClick={replayGame} />
+            <div className='game-speed'>
+                <div className={`slow ${gameSpeed === 'slow' ? 'selected' : ''}`} onClick={() => setGameSpeed('slow')}>
+                    slow
+                </div>
+                <div className={`regular ${gameSpeed === 'regular' ? 'selected' : ''}`} onClick={() => setGameSpeed('regular')}>
+                    regular
+                </div>
+                <div className={`fast ${gameSpeed === 'fast' ? 'selected' : ''}`} onClick={() => setGameSpeed('fast')}>
+                    fast
+                </div>
+            </div>
             <div className='num-guesses'>Number of guesses: {numGuesses}</div>
             <div className='card-container' style={gridStyling}>
                 {pokemonCards.map((item) => {
@@ -121,6 +123,7 @@ function GameScreen({ pokemon, numGuesses, setNumGuesses, replayGame, setGameOve
                             id={item.id}
                             url={item.url}
                             onClick={clickAllowed(item) ? showCard : () => {}}
+                            speed={cardFlipSpeeds[gameSpeed]}
                         />
                     );
                 })}

@@ -21,17 +21,6 @@ div.menu {
     justify-content: center;
     align-items: center;
     gap: 50px;
-
-    opacity: 0;
-    transition: opacity 1s ease;
-}
-
-div.menu.fade {
-    opacity: 1;
-}
-
-div.menu div.start:active {
-    transform: scale(0.9);
 }
 
 div.menu div.start,
@@ -47,3 +36,45 @@ div.difficulty-options {
     display: flex;
     gap: 20px;
 }
+
+div.menu div.start:active {
+    transform: scale(0.9);
+}
+
+/* --- CSS Transition --- */
+div.menu.appear {
+    opacity: 0;
+}
+
+div.menu.appear-active {
+    opacity: 1;
+    transition: opacity 500ms;
+}
+
+div.menu.enter {
+    opacity: 0;
+}
+
+div.menu.enter-active {
+    opacity: 1;
+    transition: opacity 500ms;
+}
+
+div.menu.enter-done {
+    opacity: 1;
+}
+
+div.menu.exit {
+    opacity: 1;
+}
+
+div.menu.exit-active {
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+div.menu.exit-done {
+    opacity: 0;
+}
+
+/* --------------------- */

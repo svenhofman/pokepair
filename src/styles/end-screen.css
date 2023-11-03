@@ -23,13 +23,36 @@ div.end-screen {
     gap: 20px;
 
     opacity: 0;
-    transition: opacity 1s ease;
-}
-
-div.end-screen.fade {
-    opacity: 1;
 }
 
 div.end-screen span.num-guesses {
     font-family: 'Pokemon Filled';
 }
+
+/* --- CSS Transition --- */
+div.end-screen.enter {
+    opacity: 0;
+}
+
+div.end-screen.enter-active {
+    opacity: 1;
+    transition: opacity 500ms;
+}
+
+div.end-screen.enter-done {
+    opacity: 1;
+}
+
+div.end-screen.exit {
+    opacity: 1;
+}
+
+div.end-screen.exit-active {
+    opacity: 0;
+    transition: opacity 500ms;
+}
+
+div.end-screen.exit-done {
+    opacity: 0;
+}
+/* --------------------- */
