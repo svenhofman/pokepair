@@ -1,0 +1,14 @@
+@font-face {
+    font-family: 'Pokemon Hollow';
+    src: url('../assets/pokemon_font_hollow.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Pokemon Filled';
+    src: url('../assets/pokemon_font_filled.ttf') format('truetype');
+}
+
+body {
+    background-image: url('../assets/pokemon_background.jpg');
+    font-family: 'Pokemon Hollow';
+}
