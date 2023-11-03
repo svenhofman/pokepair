@@ -41,12 +41,11 @@ const cardFlipSpeeds = {
     fast: 500
 };
 
-function GameScreen({ refCSSTransition, pokemon, numGuesses, setNumGuesses, replayGame, setGameOver }) {
+function GameScreen({ refCSSTransition, pokemon, gameSpeed, numGuesses, setNumGuesses, setGameSpeed, replayGame, setGameOver }) {
     const initialCardsState = computeInitialCardsState(pokemon);
     const [pokemonCards, setPokemonCards] = useState(initialCardsState);
     const [shownCards, setShownCards] = useState([]);
     const [isClickable, setIsClickable] = useState(true);
-    const [gameSpeed, setGameSpeed] = useState('regular');
 
     useEffect(() => {
         isGameOver(pokemonCards) && setGameOver();

@@ -7,23 +7,37 @@ import Pokemon from './components/Pokemon.jsx';
 import { useEffect, useRef, useState } from 'react';
 import { CSSTransition } from 'react-transition-group';
 
-const totalNumPokemon = 700;
+const TOTAL_NUM_POKEMON = 700;
+
+const determineNumPairs = (difficulty) => {
+    switch (difficulty) {
+        case 'medium':
+            return 10;
+        case 'hard':
+            return 15;
+        default:
+            return 6;
+    }
+};
+
 function App() {
     const [drawnPokemonIDs, setDrawnPokemonIDs] = useState(null);
     const [pokemonImages, setPokemonImages] = useState(null);
     const [difficulty, setDifficulty] = useState('easy');
     const [numGuesses, setNumGuesses] = useState(0);
     const [gameStatus, setGameStatus] = useState('menu');
+    const [gameSpeed, setGameSpeed] = useState('regular');
+
+    // So CSS transitions doesn't use deprecated findDomNode()
+    const menuRef = useRef(null);
+    const gameRef = useRef(null);
+    const endRef = useRef(null);
 
     useEffect(() => {
-        let numPairs;
-        if (difficulty === 'easy') numPairs = 6;
-        if (difficulty === 'medium') numPairs = 10;
-        if (difficulty === 'hard') numPairs = 15;
-
+        const numPairs = determineNumPairs(difficulty);
         const drawnIDs = [];
         while (drawnIDs.length < numPairs) {
-            let id = Math.floor(Math.random() * totalNumPokemon + 1);
+            let id = Math.floor(Math.random() * TOTAL_NUM_POKEMON + 1);
             if (!drawnIDs.includes(id)) drawnIDs.push(id);
         }
         setDrawnPokemonIDs(drawnIDs);
@@ -31,13 +45,15 @@ function App() {
 
     useEffect(() => {
         if (drawnPokemonIDs) {
-            (async () => {
-                let pokemonData = await Pokemon.getPokemon(drawnPokemonIDs);
-                pokemonData = pokemonData.map((item) => {
-                    return item.sprites.front_default;
-                });
-                setPokemonImages(pokemonData);
-            })();
+            setTimeout(() => {
+                (async () => {
+                    let pokemonData = await Pokemon.getPokemon(drawnPokemonIDs);
+                    pokemonData = pokemonData.map((item) => {
+                        return item.sprites.front_default;
+                    });
+                    setPokemonImages(pokemonData);
+                })();
+            }, 10000);
         }
     }, [drawnPokemonIDs]);
 
@@ -47,28 +63,25 @@ function App() {
         }
     }, [gameStatus]);
 
-    // So CSS transitions doesn't use deprecated findDomNode()
-    const ref1 = useRef(null);
-    const ref2 = useRef(null);
-    const ref3 = useRef(null);
-
     return (
         <>
-            <CSSTransition nodeRef={ref1} in={gameStatus === 'menu'} timeout={500} appear={true} unmountOnExit>
+            <CSSTransition nodeRef={menuRef} in={gameStatus === 'menu'} timeout={500} appear={true} unmountOnExit>
                 <MenuScreen
-                    refCSSTransition={ref1}
+                    refCSSTransition={menuRef}
                     difficulty={difficulty}
                     setDifficulty={setDifficulty}
                     startGame={() => setGameStatus('playing')}
                 />
             </CSSTransition>
 
-            <CSSTransition nodeRef={ref2} in={gameStatus === 'playing' || gameStatus === 'finished'} timeout={500} unmountOnExit>
+            <CSSTransition nodeRef={gameRef} in={gameStatus === 'playing' || gameStatus === 'finished'} timeout={500} unmountOnExit>
                 <GameScreen
-                    refCSSTransition={ref2}
+                    refCSSTransition={gameRef}
                     pokemon={pokemonImages}
                     numGuesses={numGuesses}
+                    gameSpeed={gameSpeed}
                     setNumGuesses={setNumGuesses}
+                    setGameSpeed={setGameSpeed}
                     replayGame={() => setGameStatus('menu')}
                     /* setGameOver is also triggered when game is already finished and replay is clicked, make sure
                      * game is not set to finished then but to menu by passing empty function */
@@ -76,8 +89,8 @@ function App() {
                 />
             </CSSTransition>
 
-            <CSSTransition nodeRef={ref3} in={gameStatus === 'finished'} timeout={500} unmountOnExit>
-                <EndScreen refCSSTransition={ref3} numGuesses={numGuesses} />
+            <CSSTransition nodeRef={endRef} in={gameStatus === 'finished'} timeout={500} unmountOnExit>
+                <EndScreen refCSSTransition={endRef} numGuesses={numGuesses} />
             </CSSTransition>
         </>
     );
