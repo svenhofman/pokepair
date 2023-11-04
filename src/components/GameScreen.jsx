@@ -1,21 +1,13 @@
-import Card from './Card.jsx';
+import GameSpeed from './GameSpeed.jsx';
+import ScoreBoard from './ScoreBoard.jsx';
+import { cardFlipSpeeds } from './CardFlipSpeeds.js';
+
 import { useEffect, useState } from 'react';
 import uniqid from 'uniqid';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
-
-const cardFlipSpeeds = {
-    slow: 3000,
-    regular: 1000,
-    fast: 500
-};
-
-const gridStyles = {
-    6: { gridTemplateRows: 'repeat(3, 1fr)', gridTemplateColumns: 'repeat(4, 1fr)' },
-    10: { gridTemplateRows: 'repeat(4, 1fr)', gridTemplateColumns: 'repeat(5, 1fr)' },
-    15: { gridTemplateRows: 'repeat(5, 1fr)', gridTemplateColumns: 'repeat(6, 1fr)' }
-};
+import CardContainer from './CardContainer.jsx';
 
 function shuffle(arr) {
     // Fisher-Yates shuffle method
@@ -68,8 +60,6 @@ function GameScreen({ refCSSTransition, pokemon, gameSpeed, numGuesses, setNumGu
         setTimeout(() => {
             setPokemonCards((prevPokemonCards) =>
                 prevPokemonCards.map((card) => {
-                    console.log('isVisible:', card.isFound);
-                    console.log('isFound:', card.isFound || card.id === shownCards[0].id || card.id === shownCards[1].id);
                     return {
                         ...card,
                         isVisible: card.isFound,
@@ -96,37 +86,12 @@ function GameScreen({ refCSSTransition, pokemon, gameSpeed, numGuesses, setNumGu
         setShownCards((prevShownCards) => [...prevShownCards, shownCardItem]);
     };
 
-    let gridStyling = gridStyles[pokemon.length];
-
     return (
         <div ref={refCSSTransition} className='game-screen'>
             <FontAwesomeIcon className='replay fa-xl' icon={faRotateRight} onClick={replayGame} />
-            <div className='game-speed'>
-                <div className={`slow ${gameSpeed === 'slow' ? 'selected' : ''}`} onClick={() => setGameSpeed('slow')}>
-                    slow
-                </div>
-                <div className={`regular ${gameSpeed === 'regular' ? 'selected' : ''}`} onClick={() => setGameSpeed('regular')}>
-                    regular
-                </div>
-                <div className={`fast ${gameSpeed === 'fast' ? 'selected' : ''}`} onClick={() => setGameSpeed('fast')}>
-                    fast
-                </div>
-            </div>
-            <div className='num-guesses'>Number of guesses: {numGuesses}</div>
-            <div className='card-container' style={gridStyling}>
-                {pokemonCards.map((item) => {
-                    return (
-                        <Card
-                            key={item.id}
-                            isVisible={item.isVisible || item.isFound}
-                            id={item.id}
-                            url={item.url}
-                            onClick={isClickable && !(item.isFound || item.isVisible) ? showCard : () => {}}
-                            speed={cardFlipSpeeds[gameSpeed]}
-                        />
-                    );
-                })}
-            </div>
+            <GameSpeed gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} />
+            <ScoreBoard numGuesses={numGuesses} />
+            <CardContainer pokemonCards={pokemonCards} gameSpeed={gameSpeed} isClickable={isClickable} showCard={showCard} />
         </div>
     );
 }
