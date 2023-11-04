@@ -3,8 +3,8 @@ import pokemon_card_front from '../assets/pokemon_card_front.png';
 function Card({ id, isVisible, url, onClick, speed }) {
     return (
         <div className={`card  ${isVisible ? 'flip' : ''}`} onClick={() => onClick(id)} style={{ transitionDuration: `${speed}ms` }}>
-            <img src={pokemon_card_back} alt='' className='shown-side' />
-            <img src={pokemon_card_front} alt='' className='hidden-side template' />
+            <div className='modal shown-side' />
+            <div className='modal hidden-side' />
             <img src={url} alt='' className='hidden-side pokemon' />
         </div>
     );

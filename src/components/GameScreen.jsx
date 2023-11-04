@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import uniqid from 'uniqid';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
+import { faCircleLeft } from '@fortawesome/free-solid-svg-icons';
 import CardContainer from './CardContainer.jsx';
 
 function shuffle(arr) {
@@ -40,8 +40,7 @@ function isGameOver(pokemonCards) {
 }
 
 function GameScreen({ refCSSTransition, pokemon, gameSpeed, numGuesses, setNumGuesses, setGameSpeed, replayGame, setGameOver }) {
-    const initialCardsState = computeInitialCardsState(pokemon);
-    const [pokemonCards, setPokemonCards] = useState(initialCardsState);
+    const [pokemonCards, setPokemonCards] = useState(() => computeInitialCardsState(pokemon));
     const [shownCards, setShownCards] = useState([]);
     const [isClickable, setIsClickable] = useState(true);
 
@@ -51,7 +50,7 @@ function GameScreen({ refCSSTransition, pokemon, gameSpeed, numGuesses, setNumGu
 
     useEffect(() => {
         if (shownCards.length < 2) return;
-        setNumGuesses((prevNumGuesses) => prevNumGuesses + 1);
+        setNumGuesses((prevNumGuesses) => ({ ...prevNumGuesses, current: prevNumGuesses['current'] + 1 }));
         setIsClickable(false);
 
         const isMatch = areMatchingCards(shownCards);
@@ -88,9 +87,11 @@ function GameScreen({ refCSSTransition, pokemon, gameSpeed, numGuesses, setNumGu
 
     return (
         <div ref={refCSSTransition} className='game-screen'>
-            <FontAwesomeIcon className='replay fa-xl' icon={faRotateRight} onClick={replayGame} />
-            <GameSpeed gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} />
-            <ScoreBoard numGuesses={numGuesses} />
+            <div className='header'>
+                <GameSpeed gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} />
+                <ScoreBoard numGuesses={numGuesses} />
+                <FontAwesomeIcon className='to-menu-icon fa-xl' icon={faCircleLeft} onClick={replayGame} />
+            </div>
             <CardContainer pokemonCards={pokemonCards} gameSpeed={gameSpeed} isClickable={isClickable} showCard={showCard} />
         </div>
     );

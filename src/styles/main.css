@@ -8,7 +8,27 @@
     src: url('../assets/pokemon_font_filled.ttf') format('truetype');
 }
 
+:root {
+    --modal-background-color: rgba(255, 255, 255, 0.65);
+    --modal-background-shading: rgba(255, 255, 255, 0.35);
+    --text-color: rgb(28, 38, 80);
+}
+
 body {
-    background-image: url('../assets/pokemon_background.jpg');
+    background: url('../assets/pokepair_background.png') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+
     font-family: 'Pokemon Hollow';
+    color: var(--text-color);
+}
+
+div.modal {
+    background: rgba(255, 0, 0, 0.3);
+    background: var(--modal-background-color);
+    border-radius: 10px;
+    -webkit-box-shadow: 0 0 10px 5px var(--modal-background-shading);
+    box-shadow: 0 0 10px 5px var(--modal-background-shading);
 }

@@ -22,52 +22,74 @@ const determineNumPairs = (difficulty) => {
 
 const fetchPokemonData = async (drawnPokemonIDs) => {
     const pokemonData = await Pokemon.getPokemon(drawnPokemonIDs);
-    return pokemonData.map((item) => {
-        return item.sprites.front_default;
-    });
+    if (pokemonData) {
+        return pokemonData.map((item) => {
+            return item.sprites.front_default;
+        });
+    }
+    return null;
 };
 
 function App() {
     const [drawnPokemonIDs, setDrawnPokemonIDs] = useState(null);
     const [pokemonImages, setPokemonImages] = useState(null);
     const [difficulty, setDifficulty] = useState('easy');
-    const [numGuesses, setNumGuesses] = useState(0);
+    const [numGuesses, setNumGuesses] = useState({ current: 0, easy: Infinity, medium: Infinity, hard: Infinity });
     const [gameStatus, setGameStatus] = useState('menu');
     const [gameSpeed, setGameSpeed] = useState('regular');
+    const [timeOutID, setTimeOutID] = useState(null);
 
     // So CSS transitions doesn't use deprecated findDomNode()
     const menuRef = useRef(null);
     const gameRef = useRef(null);
     const endRef = useRef(null);
     const loadingRef = useRef(null);
+    const errorRef = useRef(null);
 
     useEffect(() => {
-        const numPairs = determineNumPairs(difficulty);
-        const drawnIDs = [];
-        while (drawnIDs.length < numPairs) {
-            let id = Math.floor(Math.random() * TOTAL_NUM_POKEMON + 1);
-            if (!drawnIDs.includes(id)) drawnIDs.push(id);
+        // Only start determining cards when difficulty is chosen and start is pressed, to make sure API is only
+        // called once and not on every change of difficulty
+        if (gameStatus === 'ready') {
+            const numPairs = determineNumPairs(difficulty);
+            const drawnIDs = [];
+            while (drawnIDs.length < numPairs) {
+                let id = Math.floor(Math.random() * TOTAL_NUM_POKEMON + 1);
+                if (!drawnIDs.includes(id)) drawnIDs.push(id);
+            }
+            setDrawnPokemonIDs(drawnIDs);
         }
-        setDrawnPokemonIDs(drawnIDs);
-    }, [difficulty]);
+    }, [difficulty, gameStatus]);
 
     useEffect(() => {
         if (drawnPokemonIDs) {
-            setTimeout(() => {
-                (async () => {
-                    const data = await fetchPokemonData(drawnPokemonIDs);
-                    setPokemonImages(data);
-                })();
-            }, 3000);
+            // make sure loading screen only gets shown when API request takes too long
+            setTimeOutID(setTimeout(() => setGameStatus('loading'), 1000));
+
+            (async () => {
+                const data = await fetchPokemonData(drawnPokemonIDs);
+                if (data) setPokemonImages(data);
+                else setGameStatus('error');
+            })();
         }
     }, [drawnPokemonIDs]);
 
     useEffect(() => {
-        if (gameStatus === 'loading' && pokemonImages !== null) {
+        if ((gameStatus === 'ready' || gameStatus === 'loading') && pokemonImages !== null) {
             // the game is ready to be played
+            clearTimeout(timeOutID);
             setGameStatus('playing');
         } else if (gameStatus === 'playing') {
-            setNumGuesses(0);
+            setNumGuesses({ ...numGuesses, current: 0 });
+        } else if (gameStatus === 'menu') {
+            // reset pokemon cards
+            setDrawnPokemonIDs(null);
+            setPokemonImages(null);
+        } else if (gameStatus === 'finished') {
+            // possibly update score
+            setNumGuesses((prevNumGuesses) => ({
+                ...prevNumGuesses,
+                [difficulty]: prevNumGuesses['current'] < prevNumGuesses[difficulty] ? prevNumGuesses['current'] : prevNumGuesses[difficulty]
+            }));
         }
     }, [gameStatus, pokemonImages]);
 
@@ -78,13 +100,19 @@ function App() {
                     refCSSTransition={menuRef}
                     difficulty={difficulty}
                     setDifficulty={setDifficulty}
-                    startGame={() => setGameStatus('loading')}
+                    startGame={() => setGameStatus('ready')}
                 />
             </CSSTransition>
 
             <CSSTransition nodeRef={loadingRef} in={gameStatus === 'loading'} timeout={500} unmountOnExit>
-                <div ref={loadingRef} className='loading-screen'>
+                <div ref={loadingRef} className='modal loading-screen'>
                     Loading...
+                </div>
+            </CSSTransition>
+
+            <CSSTransition nodeRef={errorRef} in={gameStatus === 'error'} timeout={500} unmountOnExit>
+                <div ref={errorRef} className='modal error-screen'>
+                    An error occurred while loading the game, please refresh the page
                 </div>
             </CSSTransition>
 
@@ -104,7 +132,7 @@ function App() {
             </CSSTransition>
 
             <CSSTransition nodeRef={endRef} in={gameStatus === 'finished'} timeout={500} unmountOnExit>
-                <EndScreen refCSSTransition={endRef} numGuesses={numGuesses} />
+                <EndScreen refCSSTransition={endRef} numGuesses={numGuesses} playAgain={() => setGameStatus('menu')} />
             </CSSTransition>
         </>
     );

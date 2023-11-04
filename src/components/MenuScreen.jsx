@@ -1,6 +1,6 @@
 function MenuScreen({ refCSSTransition, difficulty, setDifficulty, startGame }) {
     return (
-        <div ref={refCSSTransition} className='menu'>
+        <div ref={refCSSTransition} className='modal menu'>
             <div className='difficulty-options'>
                 <div className={`easy ${difficulty === 'easy' ? 'selected' : ''}`} onClick={() => setDifficulty('easy')}>
                     easy
