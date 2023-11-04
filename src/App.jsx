@@ -63,12 +63,16 @@ function App() {
     useEffect(() => {
         if (drawnPokemonIDs) {
             // make sure loading screen only gets shown when API request takes too long
-            setTimeOutID(setTimeout(() => setGameStatus('loading'), 1000));
+            const id = setTimeout(() => setGameStatus('loading'), 1000);
+            setTimeOutID(id);
 
             (async () => {
                 const data = await fetchPokemonData(drawnPokemonIDs);
                 if (data) setPokemonImages(data);
-                else setGameStatus('error');
+                else {
+                    clearTimeout(id);
+                    setGameStatus('error');
+                }
             })();
         }
     }, [drawnPokemonIDs]);
@@ -106,13 +110,13 @@ function App() {
 
             <CSSTransition nodeRef={loadingRef} in={gameStatus === 'loading'} timeout={500} unmountOnExit>
                 <div ref={loadingRef} className='modal loading-screen'>
-                    Loading...
+                    loading...
                 </div>
             </CSSTransition>
 
             <CSSTransition nodeRef={errorRef} in={gameStatus === 'error'} timeout={500} unmountOnExit>
                 <div ref={errorRef} className='modal error-screen'>
-                    An error occurred while loading the game, please refresh the page
+                    an error occurred while loading the game, please refresh the page
                 </div>
             </CSSTransition>
 
