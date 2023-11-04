@@ -20,6 +20,13 @@ const determineNumPairs = (difficulty) => {
     }
 };
 
+const fetchPokemonData = async (drawnPokemonIDs) => {
+    const pokemonData = await Pokemon.getPokemon(drawnPokemonIDs);
+    return pokemonData.map((item) => {
+        return item.sprites.front_default;
+    });
+};
+
 function App() {
     const [drawnPokemonIDs, setDrawnPokemonIDs] = useState(null);
     const [pokemonImages, setPokemonImages] = useState(null);
@@ -32,6 +39,7 @@ function App() {
     const menuRef = useRef(null);
     const gameRef = useRef(null);
     const endRef = useRef(null);
+    const loadingRef = useRef(null);
 
     useEffect(() => {
         const numPairs = determineNumPairs(difficulty);
@@ -47,21 +55,21 @@ function App() {
         if (drawnPokemonIDs) {
             setTimeout(() => {
                 (async () => {
-                    let pokemonData = await Pokemon.getPokemon(drawnPokemonIDs);
-                    pokemonData = pokemonData.map((item) => {
-                        return item.sprites.front_default;
-                    });
-                    setPokemonImages(pokemonData);
+                    const data = await fetchPokemonData(drawnPokemonIDs);
+                    setPokemonImages(data);
                 })();
-            }, 10000);
+            }, 3000);
         }
     }, [drawnPokemonIDs]);
 
     useEffect(() => {
-        if (gameStatus === 'playing') {
+        if (gameStatus === 'loading' && pokemonImages !== null) {
+            // the game is ready to be played
+            setGameStatus('playing');
+        } else if (gameStatus === 'playing') {
             setNumGuesses(0);
         }
-    }, [gameStatus]);
+    }, [gameStatus, pokemonImages]);
 
     return (
         <>
@@ -70,8 +78,14 @@ function App() {
                     refCSSTransition={menuRef}
                     difficulty={difficulty}
                     setDifficulty={setDifficulty}
-                    startGame={() => setGameStatus('playing')}
+                    startGame={() => setGameStatus('loading')}
                 />
+            </CSSTransition>
+
+            <CSSTransition nodeRef={loadingRef} in={gameStatus === 'loading'} timeout={500} unmountOnExit>
+                <div ref={loadingRef} className='loading-screen'>
+                    Loading...
+                </div>
             </CSSTransition>
 
             <CSSTransition nodeRef={gameRef} in={gameStatus === 'playing' || gameStatus === 'finished'} timeout={500} unmountOnExit>

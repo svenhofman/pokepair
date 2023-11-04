@@ -1,0 +1,50 @@
+div.loading-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background: rgba(255, 0, 0, 0.3);
+    border: 1px solid rgb(28, 38, 80);
+    border-radius: 10px;
+    -webkit-box-shadow: 0 0 10px 3px rgb(28, 38, 80);
+    box-shadow: 0 0 10px 3px rgb(28, 38, 80);
+
+    height: 100px;
+    width: 300px;
+    font-size: 30px;
+    font-weight: bold;
+    color: rgb(28, 38, 80);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- CSS Transition --- */
+div.loading-screen.enter {
+    opacity: 0;
+}
+
+div.loading-screen.enter-active {
+    opacity: 1;
+    transition: opacity 500ms;
+}
+
+div.loading-screen.enter-done {
+    opacity: 1;
+}
+
+div.loading-screen.exit {
+    opacity: 1;
+}
+
+div.loading-screen.exit-active {
+    opacity: 0;
+    transition: opacity 500ms;
+}
+
+div.loading-screen.exit-done {
+    opacity: 0;
+}
+/* --------------------- */

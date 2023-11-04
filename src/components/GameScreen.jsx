@@ -5,6 +5,18 @@ import uniqid from 'uniqid';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
 
+const cardFlipSpeeds = {
+    slow: 3000,
+    regular: 1000,
+    fast: 500
+};
+
+const gridStyles = {
+    6: { gridTemplateRows: 'repeat(3, 1fr)', gridTemplateColumns: 'repeat(4, 1fr)' },
+    10: { gridTemplateRows: 'repeat(4, 1fr)', gridTemplateColumns: 'repeat(5, 1fr)' },
+    15: { gridTemplateRows: 'repeat(5, 1fr)', gridTemplateColumns: 'repeat(6, 1fr)' }
+};
+
 function shuffle(arr) {
     // Fisher-Yates shuffle method
     for (let i = arr.length - 1; i > 0; i--) {
@@ -14,7 +26,7 @@ function shuffle(arr) {
     return arr;
 }
 
-function matchingCards(pokemonCards) {
+function areMatchingCards(pokemonCards) {
     return pokemonCards[0].id.split('-')[0] === pokemonCards[1].id.split('-')[0];
 }
 
@@ -35,12 +47,6 @@ function isGameOver(pokemonCards) {
     }, true);
 }
 
-const cardFlipSpeeds = {
-    slow: 3000,
-    regular: 1000,
-    fast: 500
-};
-
 function GameScreen({ refCSSTransition, pokemon, gameSpeed, numGuesses, setNumGuesses, setGameSpeed, replayGame, setGameOver }) {
     const initialCardsState = computeInitialCardsState(pokemon);
     const [pokemonCards, setPokemonCards] = useState(initialCardsState);
@@ -52,29 +58,28 @@ function GameScreen({ refCSSTransition, pokemon, gameSpeed, numGuesses, setNumGu
     }, [pokemonCards, setGameOver]);
 
     useEffect(() => {
-        if (shownCards.length > 1) {
-            setNumGuesses((prevNumGuesses) => prevNumGuesses + 1);
-            setIsClickable(false);
-            if (!matchingCards(shownCards)) {
-                setTimeout(() => {
-                    setPokemonCards(
-                        pokemonCards.map((item) => {
-                            return { ...item, isVisible: false };
-                        })
-                    );
-                    setIsClickable(true);
-                }, cardFlipSpeeds[gameSpeed]);
-            } else {
-                setPokemonCards((prevPokemonCards) =>
-                    prevPokemonCards.map((card) => ({
+        if (shownCards.length < 2) return;
+        setNumGuesses((prevNumGuesses) => prevNumGuesses + 1);
+        setIsClickable(false);
+
+        const isMatch = areMatchingCards(shownCards);
+        const delay = !isMatch ? cardFlipSpeeds[gameSpeed] : 0;
+
+        setTimeout(() => {
+            setPokemonCards((prevPokemonCards) =>
+                prevPokemonCards.map((card) => {
+                    console.log('isVisible:', card.isFound);
+                    console.log('isFound:', card.isFound || card.id === shownCards[0].id || card.id === shownCards[1].id);
+                    return {
                         ...card,
-                        isFound: card.isFound || card.id === shownCards[0].id || card.id === shownCards[1].id
-                    }))
-                );
-                setIsClickable(true);
-            }
+                        isVisible: card.isFound,
+                        isFound: card.isFound || (isMatch && (card.id === shownCards[0].id || card.id === shownCards[1].id))
+                    };
+                })
+            );
+            setIsClickable(true);
             setShownCards([]);
-        }
+        }, delay);
     }, [shownCards, pokemonCards]);
 
     const showCard = (id) => {
@@ -91,12 +96,7 @@ function GameScreen({ refCSSTransition, pokemon, gameSpeed, numGuesses, setNumGu
         setShownCards((prevShownCards) => [...prevShownCards, shownCardItem]);
     };
 
-    const clickAllowed = (item) => isClickable && !(item.isFound || item.isVisible);
-
-    let gridStyling;
-    if (pokemon.length === 6) gridStyling = { gridTemplateRows: 'repeat(3, 1fr)', gridTemplateColumns: 'repeat(4, 1fr' };
-    else if (pokemon.length === 10) gridStyling = { gridTemplateRows: 'repeat(4, 1fr)', gridTemplateColumns: 'repeat(5, 1fr' };
-    else if (pokemon.length === 15) gridStyling = { gridTemplateRows: 'repeat(5, 1fr)', gridTemplateColumns: 'repeat(6, 1fr' };
+    let gridStyling = gridStyles[pokemon.length];
 
     return (
         <div ref={refCSSTransition} className='game-screen'>
@@ -121,7 +121,7 @@ function GameScreen({ refCSSTransition, pokemon, gameSpeed, numGuesses, setNumGu
                             isVisible={item.isVisible || item.isFound}
                             id={item.id}
                             url={item.url}
-                            onClick={clickAllowed(item) ? showCard : () => {}}
+                            onClick={isClickable && !(item.isFound || item.isVisible) ? showCard : () => {}}
                             speed={cardFlipSpeeds[gameSpeed]}
                         />
                     );
