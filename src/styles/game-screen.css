@@ -87,7 +87,7 @@ div.game-speed div.selected {
 
 div.score-board {
     position: absolute;
-    bottom: 2%;
+    bottom: 3%;
     left: 50%;
     transform: translateX(-50%);
 
@@ -95,19 +95,20 @@ div.score-board {
 
     display: flex;
     align-items: center;
+    flex-shrink: 0;
     gap: 20px;
 }
 
 div.num-guesses.current {
     font-weight: bold;
-    flex: 1;
+    flex-shrink: 0;
 }
 
 div.num-guesses.best {
     font-weight: bold;
-    padding: 10px;
 
     display: flex;
+    flex-shrink: 0;
     justify-content: center;
     align-items: center;
     gap: 20px;
