@@ -3,7 +3,7 @@ function EndScreen({ refCSSTransition, numGuesses, playAgain }) {
         <div ref={refCSSTransition} className='modal end-screen'>
             <div>well done!</div>
             <div>
-                It took <span className='num-guesses'>{numGuesses['current']}</span> guesses
+                it took <span className='num-guesses'>{numGuesses['current']}</span> guesses
             </div>
             <hr />
             <div className='play-again' onClick={playAgain}>
