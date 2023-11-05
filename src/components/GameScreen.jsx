@@ -87,12 +87,10 @@ function GameScreen({ refCSSTransition, pokemon, gameSpeed, numGuesses, setNumGu
 
     return (
         <div ref={refCSSTransition} className='game-screen'>
-            <div className='header'>
-                <GameSpeed gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} />
-                <ScoreBoard numGuesses={numGuesses} />
-                <FontAwesomeIcon className='to-menu-icon fa-xl' icon={faCircleLeft} onClick={replayGame} />
-            </div>
+            <GameSpeed gameSpeed={gameSpeed} setGameSpeed={setGameSpeed} />
+            <FontAwesomeIcon className='to-menu-icon fa-xl' icon={faCircleLeft} onClick={replayGame} />
             <CardContainer pokemonCards={pokemonCards} gameSpeed={gameSpeed} isClickable={isClickable} showCard={showCard} />
+            <ScoreBoard numGuesses={numGuesses} />
         </div>
     );
 }

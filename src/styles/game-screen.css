@@ -51,23 +51,25 @@ div.card {
 }
 
 /* --- Header styling ---  */
-div.header {
-    position: absolute;
-    width: auto;
-    top: 2%;
-    left: 50%;
+/*div.header {*/
+/*    position: absolute;*/
+/*    width: 100%;*/
+/*    top: 2%;*/
 
-    display: flex;
-    align-items: center;
-    gap: 30px;
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    gap: 30px;*/
 
-    height: 70px;
-}
+/*    height: 70px;*/
+/*}*/
 
 div.game-speed {
+    position: absolute;
+    top: 3%;
+    left: 50%;
     transform: translateX(-50%);
 
-    font-size: 20px;
+    font-size: 25px;
     font-weight: bold;
 
     display: flex;
@@ -84,22 +86,25 @@ div.game-speed div.selected {
 }
 
 div.score-board {
+    position: absolute;
+    bottom: 2%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    font-size: 25px;
+
     display: flex;
     align-items: center;
     gap: 20px;
 }
 
 div.num-guesses.current {
-    font-size: 20px;
     font-weight: bold;
-
-    width: 125px;
+    flex: 1;
 }
 
 div.num-guesses.best {
-    font-size: 20px;
     font-weight: bold;
-
     padding: 10px;
 
     display: flex;
@@ -109,10 +114,12 @@ div.num-guesses.best {
 }
 
 .to-menu-icon {
-    color: rgb(28, 38, 80);
     height: 35px;
-    transform: translateY(-10%);
-    margin-left: 50px;
+
+    position: absolute;
+    top: 3%;
+    right: 2%;
+
     cursor: pointer;
 }
 .to-menu-icon:active {
