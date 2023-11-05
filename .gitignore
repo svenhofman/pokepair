@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+**/.DS_STORE
+
+*.eslint.*
+*.prettier.*
+project_structure.MD
