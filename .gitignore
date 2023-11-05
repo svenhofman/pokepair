@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 **/.DS_STORE
 
-*.eslint.*
-*.prettier.*
+*.eslint*
+*.prettier*
+
 project_structure.MD
