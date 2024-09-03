@@ -16,6 +16,18 @@ div.modal.menu {
     gap: 50px;
 }
 
+a.github-link {
+    color: inherit;
+}
+
+.github-icon {
+    height: 35px;
+
+    position: absolute;
+    top: 3%;
+    right: 2%;
+}
+
 div.menu div.start,
 div.menu div.difficulty-options > * {
     cursor: pointer;
@@ -35,38 +47,38 @@ div.menu div.start:active {
 }
 
 /* --- CSS Transition --- */
-div.menu.appear {
+div.menu-screen.appear {
     opacity: 0;
 }
 
-div.menu.appear-active {
+div.menu-screen.appear-active {
     opacity: 1;
     transition: opacity 500ms;
 }
 
-div.menu.enter {
+div.menu-screen.enter {
     opacity: 0;
 }
 
-div.menu.enter-active {
+div.menu-screen.enter-active {
     opacity: 1;
     transition: opacity 500ms;
 }
 
-div.menu.enter-done {
+div.menu-screen.enter-done {
     opacity: 1;
 }
 
-div.menu.exit {
+div.menu-screen.exit {
     opacity: 1;
 }
 
-div.menu.exit-active {
+div.menu-screen.exit-active {
     opacity: 0;
     transition: opacity 500ms;
 }
 
-div.menu.exit-done {
+div.menu-screen.exit-done {
     opacity: 0;
 }
 
